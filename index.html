@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="متابعة أسعار الذهب والدولار وتحويل العملات - مصر والسعودية">
+    <title>📊 متابعة الأسعار - الذهب والدولار</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>📊 متابعة أسعار الذهب والعملات</h1>
+            <p class="subtitle">تحديث يومي تلقائي - بيانات دقيقة وموثوقة</p>
+            <div class="last-update" id="lastUpdate">آخر تحديث: جاري التحميل...</div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- ═══════════════════════════════════════════ -->
+            <!-- 🟡 القسم الأول: أسعار الذهب -->
+            <!-- ═══════════════════════════════════════════ -->
+            <section class="section gold-section">
+                <div class="section-header">
+                    <h2>🟡 أسعار الذهب</h2>
+                </div>
+
+                <!-- اختيار الدولة والعيار -->
+                <div class="controls">
+                    <div class="control-group">
+                        <label>الدولة:</label>
+                        <div class="button-group">
+                            <button class="btn btn-active" data-country="EGP" onclick="selectCountry('EGP')">
+                                🇪🇬 مصر
+                            </button>
+                            <button class="btn" data-country="SAR" onclick="selectCountry('SAR')">
+                                🇸🇦 السعودية
+                            </button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>العيار:</label>
+                        <div class="button-group">
+                            <button class="btn btn-active" data-karat="21" onclick="selectKarat('21')">
+                                عيار 21
+                            </button>
+                            <button class="btn" data-karat="24" onclick="selectKarat('24')">
+                                عيار 24
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- السعر الحالي -->
+                <div class="price-card">
+                    <div class="price-main">
+                        <span class="price-label">السعر الحالي للجرام:</span>
+                        <span class="price-value" id="goldPrice">-- --</span>
+                        <span class="price-currency" id="goldCurrency">جنيه</span>
+                    </div>
+                </div>
+
+                <!-- مؤشرات المقارنة الزمنية -->
+                <div class="indicators-grid">
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع أمس</div>
+                        <div class="indicator-value" id="gold-yesterday">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع أسبوع</div>
+                        <div class="indicator-value" id="gold-week">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع شهر</div>
+                        <div class="indicator-value" id="gold-month">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع 6 شهور</div>
+                        <div class="indicator-value" id="gold-6months">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع سنة</div>
+                        <div class="indicator-value" id="gold-year">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الرسم البياني -->
+                <div class="chart-container">
+                    <div class="chart-controls">
+                        <button class="chart-btn" onclick="changeGoldPeriod('7d')">7 أيام</button>
+                        <button class="chart-btn" onclick="changeGoldPeriod('30d')">30 يوم</button>
+                        <button class="chart-btn chart-btn-active" onclick="changeGoldPeriod('1y')">سنة</button>
+                    </div>
+                    <canvas id="goldChart"></canvas>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════ -->
+            <!-- 💵 القسم الثاني: سعر الدولار -->
+            <!-- ═══════════════════════════════════════════ -->
+            <section class="section dollar-section">
+                <div class="section-header">
+                    <h2>💵 سعر الدولار مقابل الجنيه</h2>
+                </div>
+
+                <!-- السعر الحالي -->
+                <div class="price-card">
+                    <div class="price-main">
+                        <span class="price-label">دولار أمريكي واحد =</span>
+                        <span class="price-value" id="dollarPrice">-- --</span>
+                        <span class="price-currency">جنيه مصري</span>
+                    </div>
+                </div>
+
+                <!-- مؤشرات المقارنة الزمنية -->
+                <div class="indicators-grid">
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع أمس</div>
+                        <div class="indicator-value" id="dollar-yesterday">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع أسبوع</div>
+                        <div class="indicator-value" id="dollar-week">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع شهر</div>
+                        <div class="indicator-value" id="dollar-month">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع 6 شهور</div>
+                        <div class="indicator-value" id="dollar-6months">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                    <div class="indicator-card">
+                        <div class="indicator-label">مقارنة مع سنة</div>
+                        <div class="indicator-value" id="dollar-year">
+                            <span class="indicator-arrow">-</span>
+                            <span class="indicator-percent">--%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الرسم البياني -->
+                <div class="chart-container">
+                    <div class="chart-controls">
+                        <button class="chart-btn" onclick="changeDollarPeriod('7d')">7 أيام</button>
+                        <button class="chart-btn" onclick="changeDollarPeriod('30d')">30 يوم</button>
+                        <button class="chart-btn chart-btn-active" onclick="changeDollarPeriod('1y')">سنة</button>
+                    </div>
+                    <canvas id="dollarChart"></canvas>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════ -->
+            <!-- 🔁 القسم الثالث: محول العملات -->
+            <!-- ═══════════════════════════════════════════ -->
+            <section class="section converter-section">
+                <div class="section-header">
+                    <h2>🔁 محول العملات</h2>
+                </div>
+
+                <div class="converter-grid">
+                    <div class="currency-input">
+                        <label for="egpInput">
+                            <span class="flag">🇪🇬</span>
+                            <span>الجنيه المصري (EGP)</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            id="egpInput" 
+                            placeholder="0.00" 
+                            step="0.01"
+                            oninput="convertCurrency('EGP')"
+                        >
+                    </div>
+
+                    <div class="currency-input">
+                        <label for="sarInput">
+                            <span class="flag">🇸🇦</span>
+                            <span>الريال السعودي (SAR)</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            id="sarInput" 
+                            placeholder="0.00" 
+                            step="0.01"
+                            oninput="convertCurrency('SAR')"
+                        >
+                    </div>
+
+                    <div class="currency-input">
+                        <label for="usdInput">
+                            <span class="flag">🇺🇸</span>
+                            <span>الدولار الأمريكي (USD)</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            id="usdInput" 
+                            placeholder="0.00" 
+                            step="0.01"
+                            oninput="convertCurrency('USD')"
+                        >
+                    </div>
+                </div>
+
+                <div class="converter-note">
+                    💡 الأسعار محدثة يوميًا وتعتمد على أسعار السوق الرسمية
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>📊 موقع شخصي لمتابعة الأسعار - تحديث تلقائي يومي</p>
+            <p class="footer-note">البيانات استرشادية وللمتابعة الشخصية فقط</p>
+            <p class="footer-credit">تم التصميم والتطوير بواسطة خطوة للتصميمات © 2026</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
