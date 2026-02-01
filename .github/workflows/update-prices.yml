@@ -24,6 +24,8 @@ jobs:
           pip install requests beautifulsoup4
           
       - name: Update market prices
+        env:
+          GOLDAPI_KEY: ${{ secrets.GOLDAPI_KEY }}
         run: python scripts/update_prices.py
         
       - name: Commit and push changes
