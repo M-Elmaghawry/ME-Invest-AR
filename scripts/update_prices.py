@@ -69,13 +69,19 @@ def get_gold_price_egypt_24k():
         response.raise_for_status()
         data = response.json()
         
-        # استخراج السعر بالجرام
         price = data.get('price_gram_24k', 0)
+        print(f"✅ Gold EGP 24k fetched: {price}")
         return round(price, 2)
         
+    except requests.exceptions.HTTPError as e:
+        print(f"❌ HTTP Error fetching Egypt gold price: {e}")
+        if e.response.status_code == 401:
+            print("⚠️ API Key invalid or missing!")
+        elif e.response.status_code == 429:
+            print("⚠️ API rate limit exceeded!")
+        return 3850.00
     except Exception as e:
         print(f"❌ Error fetching Egypt gold price: {e}")
-        # Return fallback price
         return 3850.00
 
 def get_gold_price_saudi_24k():
@@ -90,42 +96,39 @@ def get_gold_price_saudi_24k():
         response.raise_for_status()
         data = response.json()
         
-        # استخراج السعر بالجرام
         price = data.get('price_gram_24k', 0)
+        print(f"✅ Gold SAR 24k fetched: {price}")
         return round(price, 2)
         
+    except requests.exceptions.HTTPError as e:
+        print(f"❌ HTTP Error fetching Saudi gold price: {e}")
+        if e.response.status_code == 401:
+            print("⚠️ API Key invalid or missing!")
+        elif e.response.status_code == 429:
+            print("⚠️ API rate limit exceeded!")
+        return 363.00
     except Exception as e:
         print(f"❌ Error fetching Saudi gold price: {e}")
-        # Return fallback price
         return 363.00
 
 def fetch_usd_egp_rate():
     """
     جلب سعر صرف الدولار مقابل الجنيه المصري
-    
-    يمكنك استخدام:
-    - ExchangeRate-API.com
-    - CurrencyAPI.com
-    - البنك المركزي المصري
     """
     try:
-        # Example using ExchangeRate-API (free tier available)
-        # response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
-        # data = response.json()
-        # usd_egp = data['rates']['EGP']
+        url = 'https://api.exchangerate-api.com/v4/latest/USD'
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
         
-        # Alternative: CurrencyLayer API
-        # api_key = 'YOUR_API_KEY'
-        # response = requests.get(f'http://api.currencylayer.com/live?access_key={api_key}&currencies=EGP&source=USD')
-        # data = response.json()
-        # usd_egp = data['quotes']['USDEGP']
-        
-        # Placeholder - استبدل بالكود الحقيقي
-        return 50.30
+        usd_egp = data['rates']['EGP']
+        print(f"✅ USD/EGP rate fetched: {usd_egp}")
+        return round(usd_egp, 2)
         
     except Exception as e:
         print(f"❌ Error fetching USD/EGP rate: {e}")
-        return 0
+        print("⚠️ Using fallback rate: 50.30")
+        return 50.30
 
 def load_market_history():
     """تحميل سجل البيانات الحالي"""
@@ -158,14 +161,15 @@ def update_prices():
     
     # Get today's date
     today = datetime.now().strftime('%Y-%m-%d')
+    print(f"📅 Today's date: {today}")
     
     # Load existing data
     market_history = load_market_history()
     
-    # Check if today's data already exists
+    # Check if today's data already exists and remove it to update
     if market_history and market_history[0]['date'] == today:
-        print(f"ℹ️ Data for {today} already exists. Skipping update.")
-        return
+        print(f"ℹ️ Data for {today} already exists. Updating with fresh data...")
+        market_history.pop(0)  # Remove old data for today
     
     # Fetch new prices
     print("📡 Fetching gold prices...")
@@ -174,8 +178,12 @@ def update_prices():
     print("📡 Fetching USD/EGP rate...")
     usd_egp = fetch_usd_egp_rate()
     
-    if not gold_prices or not usd_egp:
-        print("❌ Failed to fetch prices. Aborting update.")
+    if not gold_prices:
+        print("❌ Failed to fetch gold prices. Aborting update.")
+        return
+    
+    if not usd_egp:
+        print("❌ Failed to fetch USD/EGP rate. Aborting update.")
         return
     
     # Create new entry
@@ -185,17 +193,21 @@ def update_prices():
         'usd_egp': usd_egp
     }
     
+    print(f"📦 New entry created: {new_entry}")
+    
     # Add to history (prepend - newest first)
     market_history.insert(0, new_entry)
     
-    # Keep only last 365 days (optional - to prevent file from growing indefinitely)
+    # Keep only last 365 days
     market_history = market_history[:365]
     
     # Save updated data
     if save_market_history(market_history):
         print(f"✅ Successfully updated prices for {today}")
         print(f"   - Gold EGP 24k: {gold_prices['EGP']['24']}")
+        print(f"   - Gold EGP 21k: {gold_prices['EGP']['21']}")
         print(f"   - Gold SAR 24k: {gold_prices['SAR']['24']}")
+        print(f"   - Gold SAR 21k: {gold_prices['SAR']['21']}")
         print(f"   - USD/EGP: {usd_egp}")
     else:
         print("❌ Failed to save updated prices")
