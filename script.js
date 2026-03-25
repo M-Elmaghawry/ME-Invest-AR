@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadMarketData() {
     try {
-        const response = await fetch('market-history.json');
+        const response = await fetch(`market-history.json?v=${Date.now()}`, { cache: 'no-store' });
         marketData = await response.json();
         
         // Sort by date (newest first)
