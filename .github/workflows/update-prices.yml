@@ -6,6 +6,10 @@ on:
     - cron: '0 9 * * *'
   workflow_dispatch: # Allow manual trigger
 
+  # Needed so the workflow can push updated market-history.json back to the repo
+permissions:
+  contents: write
+
 jobs:
   update-prices:
     runs-on: ubuntu-latest
